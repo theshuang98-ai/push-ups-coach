@@ -172,6 +172,7 @@ body{
 .feedback-btn.med{background:var(--yellow);}
 .feedback-btn.hard{background:var(--red);color:#fff;}
 .feedback-btn svg{width:26px;height:26px;fill:currentColor;}
+.feedback-btn small{margin-left:auto;font-size:12px;font-weight:700;opacity:.85;}
 
 /* ============ Records / stats ============ */
 .tabs{display:flex;background:var(--panel);border-radius:10px;overflow:hidden;margin-bottom:12px;}

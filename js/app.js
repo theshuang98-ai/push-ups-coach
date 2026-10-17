@@ -350,9 +350,9 @@
         '<div class="circle-hint">完成 <b>' + total + '</b> 个 · ' + W.doneSets.length + ' 组</div></div>' +
         '<div class="card-label">这次训练感觉如何？</div>' +
         '<div class="feedback-grid">' +
-        '<button class="feedback-btn easy" data-action="fbEasy">' + icon('smile') + '轻松 EASY</button>' +
-        '<button class="feedback-btn med" data-action="fbMed">' + icon('meh') + '中等 MEDIUM</button>' +
-        '<button class="feedback-btn hard" data-action="fbHard">' + icon('frown') + '困难 HARD</button>' +
+        '<button class="feedback-btn easy" data-action="fbEasy">' + icon('smile') + '轻松 EASY<small>下一档位</small></button>' +
+        '<button class="feedback-btn med" data-action="fbMed">' + icon('meh') + '中等 MEDIUM<small>保持本档</small></button>' +
+        '<button class="feedback-btn hard" data-action="fbHard">' + icon('frown') + '困难 HARD<small>下调一档</small></button>' +
         '</div>';
     }
   };
@@ -589,10 +589,10 @@
 
     skipRest: function () { SFX.restEnd(); go('counter'); },
 
-    /* feedback */
-    fbEasy: function () { advanceProgress(true); },
-    fbMed: function () { advanceProgress(true); },
-    fbHard: function () { advanceProgress(false); },
+    /* feedback: easy -> next, medium -> stay, hard -> previous */
+    fbEasy: function () { advanceProgress(1); },
+    fbMed: function () { advanceProgress(0); },
+    fbHard: function () { advanceProgress(-1); },
 
     saveSettings: function () {
       var soundOn = $$('[data-set]').filter(function (b) { return b.classList.contains('on'); })[0];
@@ -684,10 +684,12 @@
     go('feedback');
   }
 
-  function advanceProgress(advance) {
+  // dir: 1 = easy -> next day; 0 = medium -> stay; -1 = hard -> previous day
+  function advanceProgress(dir) {
     var p = P();
-    if (advance) {
-      var day = p.day + 1, level = p.level;
+    var day = p.day, level = p.level;
+    if (dir === 1) {
+      day++;
       if (day >= 6) { day = 0; level++; }
       if (level >= 6) {
         // completed all levels
@@ -699,8 +701,12 @@
         go('done');
         return;
       }
-      Store.setProgress({ level: level, day: day });
+    } else if (dir === -1) {
+      day--;
+      if (day < 0) { day = 5; level--; }
+      if (level < 0) { level = 0; day = 0; }
     }
+    Store.setProgress({ level: level, day: day });
     go('training');
   }
 
