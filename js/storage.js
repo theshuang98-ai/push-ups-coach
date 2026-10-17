@@ -72,6 +72,11 @@
     return { total: total, best: best, average: avg, sessions: recs.length };
   }
 
+  function resetProgress() {
+    data.progress = Object.assign({}, DEFAULT.progress);
+    persist();
+  }
+
   function resetAll() {
     data = JSON.parse(JSON.stringify(DEFAULT));
     persist();
@@ -93,6 +98,7 @@
     addRecord: addRecord,
     deleteRecord: deleteRecord,
     getStats: getStats,
+    resetProgress: resetProgress,
     resetAll: resetAll,
     kcal: kcal
   };

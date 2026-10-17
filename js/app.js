@@ -470,7 +470,8 @@
         '<div class="field"><label>体重（kg，用于卡路里）</label><input type="number" id="weight" value="' + s.weight + '"></div>' +
         '<div class="field"><label>年龄</label><input type="number" id="age" value="' + s.age + '"></div>' +
         '<div class="lead">数据仅保存在本机，不会上传。</div>' +
-        '<button class="btn btn-dark btn-block" style="margin-top:14px" data-action="resetAll">清空全部数据</button>' +
+        '<button class="btn btn-block" style="margin-top:14px" data-action="retest">重新测试定级</button>' +
+        '<button class="btn btn-dark btn-block" style="margin-top:10px" data-action="resetAll">清空全部数据</button>' +
         '</div><div class="stack mt"><button class="btn btn-block" data-action="saveSettings">保存</button></div>';
     },
     bind: function () {
@@ -604,6 +605,11 @@
       toast('已保存');
       later(function () { go('home'); }, 600);
     },
+    retest: function () {
+      Store.resetProgress();
+      toast('已重置档位，请重新测试');
+      later(function () { go('home'); }, 600);
+    },
     resetAll: function () {
       if (confirm('确定清空全部训练数据和记录吗？此操作不可恢复。')) {
         Store.resetAll();
@@ -698,18 +704,16 @@
     go('training');
   }
 
+  // Map test result to a training day: the last day whose target single-set
+  // max (m) is <= what you can do, so every set is achievable.
   function mapLevel(n) {
-    if (n <= 10) return [0, 0];
-    if (n <= 15) return [0, 3];
-    if (n <= 20) return [1, 0];
-    if (n <= 25) return [1, 3];
-    if (n <= 30) return [2, 0];
-    if (n <= 40) return [2, 3];
-    if (n <= 50) return [3, 0];
-    if (n <= 60) return [3, 3];
-    if (n <= 70) return [4, 0];
-    if (n <= 80) return [4, 3];
-    return [5, 0];
+    var best = [0, 0];
+    for (var l = 0; l < PLAN.length; l++) {
+      for (var d = 0; d < PLAN[l].length; d++) {
+        if (PLAN[l][d].m <= n) best = [l, d];
+      }
+    }
+    return best;
   }
 
   /* ---------------- Init ---------------- */
